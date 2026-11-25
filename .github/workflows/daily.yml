@@ -1,0 +1,45 @@
+name: 매일 데이터 갱신
+
+on:
+  schedule:
+    # 23:30 UTC = 08:30 KST. KOBIS 전일 집계가 올라온 뒤에 돈다.
+    - cron: '30 23 * * *'
+  workflow_dispatch:   # 저장소 Actions 탭에서 손으로도 돌릴 수 있다
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: KOBIS 수집
+        run: node build/fetch.js
+
+      - name: 페이지 생성
+        run: node build/build.js
+
+      - name: 변경분 커밋
+        run: |
+          if git diff --quiet -- data.json index.html; then
+            echo "바뀐 내용 없음 — 커밋 생략"
+            exit 0
+          fi
+          LAST=$(node -e "const d=require('./data.json');console.log(new Date(Date.UTC(2026,0,1)+(d.mkt.length-1)*864e5).toISOString().slice(0,10))")
+          N=$(node -e "console.log(require('./data.json').films.length)")
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json index.html
+          git commit -m "데이터 갱신 $LAST (영화 ${N}편)"
+          git push

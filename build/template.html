@@ -239,7 +239,7 @@ details td:first-child,details th:first-child{position:static}
   </section>
 
   <section class="panel" aria-labelledby="h-ins">
-    <h2 id="h-ins">올해 진행상황과 이번 주 읽기</h2>
+    <h2 id="h-ins">인사이트</h2>
     <p class="sub" style="max-width:none">매주 월 갱신</p>
     <div class="kpis prog" id="prog"></div>
     <p class="lbl" style="margin:20px 0 2px">월별 관객수 (시장 전체) · 회색은 아직 진행 중인 달</p>
@@ -331,11 +331,11 @@ const lastD=ymd(LAST);
   const wed722=byIso['2026-07-22'];
   const wb=(wed722.v/((byIso['2026-07-21'].v+byIso['2026-07-23'].v)/2));
   const fin=[
-    ['주말 쏠림은 안정적입니다',`연휴가 없는 ${normalWeeks.length}주 모두 금~일 관객이 주간 전체의 ${Math.round(Math.min(...fsShare)*100)}~${Math.round(Math.max(...fsShare)*100)}%를 차지했습니다. 토요일 관객은 주 평균의 <b>${wdIdx[5].toFixed(2)}배</b>, 일요일은 ${wdIdx[6].toFixed(2)}배였습니다. 주중에는 금요일(${wdIdx[4].toFixed(2)}배)부터 관객이 늘어나기 시작합니다. 주말에 관객이 집중되는 흐름은 특정 시기에 국한되지 않고 연중 일관되게 나타났습니다.`],
-    [`주말을 낀 4일은 월~수의 ${mean(blockRatio).toFixed(1)}배`,`목~일 4일의 하루 평균 관객은 월~수 3일보다 <b>${mean(blockRatio).toFixed(1)}배</b> 많았습니다(주별 ${Math.min(...blockRatio).toFixed(1)}~${Math.max(...blockRatio).toFixed(1)}배). 주말이 포함된 기간에 관객이 집중되는 경향이 뚜렷합니다. 다만 기간별 관객 규모를 비교할 때는 집계 일수가 다른 만큼, 단순 합계보다 하루 평균을 기준으로 보는 것이 적절합니다.`],
-    [`공휴일 관객은 평일 평균의 ${(holAvg/wkdayAvg).toFixed(1)}배`,`공휴일 ${Object.keys(HOL).filter(k=>byIso[k]).length}일의 하루 평균 관객은 ${fmtMan(Math.round(holAvg))} 명으로, 평소 월~목 평균(${fmtMan(Math.round(wkdayAvg))} 명)의 <b>${(holAvg/wkdayAvg).toFixed(1)}배</b>였습니다. 공휴일 하루가 평일 여러 날에 맞먹는 관객을 끌어들이는 셈입니다. 따라서 연휴가 포함된 주차는 일반적인 주간 관객 흐름과 구분해 해석할 필요가 있습니다. 특히 이 시기에는 개봉 2주 차 드롭률도 연휴 효과의 영향을 받을 수 있습니다.`],
-    ['2주차 드롭률은 영화마다 갈립니다',`호프(${d('호프')})와 스파이더맨(${d('스파이더맨')})은 2주 차 관객이 비슷한 폭으로 줄었습니다. 반면 명탐정 코난(${d('명탐정 코난')}), 오케이 마담2(${d('오케이 마담2')}), 경주기행(${d('경주기행')})은 하락 폭이 더 컸습니다. 옵세션은 오히려 <b>${d('옵세션')}</b>로 관객이 늘었습니다. 휴일이 없는 주차에 나타난 상승이라는 점에서, 신작 효과보다는 입소문에 따른 관객 유입 가능성을 살펴볼 만합니다. 개봉 후 관객 유지력은 작품마다 상당한 차이를 보입니다.`],
-    ['수요일 관객은 신작 개봉과 할인 효과에 영향을 받습니다',`수요일 관객 지수는 ${wdIdx[2].toFixed(2)}로 월~목 중 가장 높았습니다. 국내 주요 신작의 개봉일이 수요일에 집중되는 데다, 매월 마지막 수요일에는 '문화가 있는 날'의 관람료 할인 효과도 더해지기 때문입니다. 반면 주요 개봉작도 문화가 있는 날도 아니었던 7월 22일(수)의 관객은 앞뒤 화·목요일 평균의 ${wb.toFixed(2)}배에 그쳤습니다. 수요일의 상대적인 강세가 요일 자체의 특성이라기보다 개봉 일정과 할인 정책의 영향을 크게 받는다는 점을 보여줍니다.`]
+    ['주말 쏠림은 안정적입니다',`연휴가 없는 ${normalWeeks.length}주 모두 금~일 관객이 주간 전체의 ${Math.round(Math.min(...fsShare)*100)}~${Math.round(Math.max(...fsShare)*100)}%를 차지했습니다. 토요일은 주 평균의 <b>${wdIdx[5].toFixed(2)}배</b>, 일요일은 ${wdIdx[6].toFixed(2)}배이고 금요일(${wdIdx[4].toFixed(2)}배)부터 오르기 시작합니다. 주말 집중은 연중 일관되게 나타났습니다.`],
+    [`주말 낀 4일은 월~수의 ${mean(blockRatio).toFixed(1)}배`,`목~일 4일의 하루 평균 관객은 월~수 3일보다 <b>${mean(blockRatio).toFixed(1)}배</b> 많았습니다(주별 ${Math.min(...blockRatio).toFixed(1)}~${Math.max(...blockRatio).toFixed(1)}배). 기간별로 비교할 때는 집계 일수가 다른 만큼 단순 합계보다 하루 평균을 기준으로 봐야 합니다.`],
+    [`공휴일 관객은 평일의 ${(holAvg/wkdayAvg).toFixed(1)}배`,`공휴일 ${Object.keys(HOL).filter(k=>byIso[k]).length}일의 하루 평균 관객은 ${fmtMan(Math.round(holAvg))} 명으로, 평소 월~목 평균(${fmtMan(Math.round(wkdayAvg))} 명)의 <b>${(holAvg/wkdayAvg).toFixed(1)}배</b>였습니다. 하루가 평일 여러 날에 맞먹는 셈이라, 연휴가 낀 주차의 드롭률은 따로 떼어 봐야 합니다.`],
+    ['2주차 드롭률은 영화마다 갈립니다',`호프(${d('호프')})와 스파이더맨(${d('스파이더맨')})은 비슷하게 줄었지만, 명탐정 코난(${d('명탐정 코난')})과 오케이 마담2(${d('오케이 마담2')})는 낙폭이 더 컸습니다. 옵세션은 오히려 <b>${d('옵세션')}</b> 늘었고, 휴일 없는 주차라 입소문 유입으로 볼 여지가 있습니다.`],
+    ['수요일 강세는 개봉 일정이 만듭니다',`수요일 관객 지수는 <b>${wdIdx[2].toFixed(2)}</b>로 월~목 중 가장 높습니다. 주요 신작 개봉이 수요일에 몰리고, 매월 마지막 수요일에는 '문화가 있는 날' 할인이 겹칩니다. 둘 다 없었던 7월 22일은 앞뒤 화·목 평균의 ${wb.toFixed(2)}배에 그쳤습니다.`]
   ];
   $('#finds').innerHTML=fin.map(x=>`<div class="find"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join('');
 })();
@@ -661,9 +661,9 @@ function renderMoBars(){
 }
 (function(){
   const box=$('#insights');
-  if(!INSIGHTS.length){box.innerHTML='<p class="empty">이번 주 읽기는 아직 작성되지 않았습니다.</p>';return;}
+  if(!INSIGHTS.length){box.innerHTML='<p class="empty">이번 주 인사이트는 아직 작성되지 않았습니다.</p>';return;}
   const one=e=>`<article class="ins"><p class="insd">${e.d} 작성</p><h3>${e.t}</h3>${e.h}</article>`;
-  box.innerHTML=one(INSIGHTS[0])+(INSIGHTS.length>1?`<details><summary>지난 주 읽기 ${INSIGHTS.length-1}개 보기</summary>${INSIGHTS.slice(1).map(one).join('')}</details>`:'');
+  box.innerHTML=one(INSIGHTS[0])+(INSIGHTS.length>1?`<details><summary>지난 인사이트 ${INSIGHTS.length-1}개 보기</summary>${INSIGHTS.slice(1).map(one).join('')}</details>`:'');
 })();
 
 /* ---------- boot ---------- */

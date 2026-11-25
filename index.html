@@ -184,9 +184,9 @@ details td:first-child,details th:first-child{position:static}
       <div class="seg" role="group" aria-label="값 보기"><button type="button" id="m-raw" aria-pressed="true">일 관객수</button><button type="button" id="m-idx" aria-pressed="false">첫 주 대비 유지력 (첫 7일 평균=100)</button></div>
       <div class="seg" role="group" aria-label="범위"><button type="button" id="x-56" aria-pressed="true">개봉 후 8주</button><button type="button" id="x-all" aria-pressed="false">전체 기간</button></div>
     </div>
-    <div class="ctrls"><div class="presets"><span>빠른 선택</span><button type="button" class="pbtn" data-p="top3">관객수 TOP3</button><button type="button" class="pbtn" data-p="summer">여름 대작</button><button type="button" class="pbtn" data-p="sep">9월 개봉작</button><button type="button" class="pbtn" data-p="small">중소 규모</button></div></div>
+    <div class="ctrls"><div class="presets"><span>빠른 선택</span><button type="button" class="pbtn" data-p="top3">관객수 TOP3</button><button type="button" class="pbtn" data-p="recent">최근 흥행작</button><button type="button" class="pbtn" data-p="summer">여름 대작</button></div></div>
     <div class="srch"><input id="q" type="search" autocomplete="off" aria-label="영화 검색"><div class="qres" id="qres" hidden></div></div>
-    <div id="chipbox"><div class="lblrow"><p class="lbl">최근 개봉영화 (최근 개봉 10편)</p><button type="button" class="clrbtn" id="clr">선택 모두 해제</button></div><div class="chips" id="chips"></div><div class="chips" id="extras" hidden></div></div>
+    <div id="chipbox"><div class="lblrow"><p class="lbl">최근 개봉영화 (최근 개봉 5편)</p><button type="button" class="clrbtn" id="clr">선택 모두 해제</button></div><div class="chips" id="chips"></div><div class="chips" id="extras" hidden></div></div>
     <div class="hint" id="hint" aria-live="polite"></div>
     <div class="legend" id="lgd"></div>
     <div class="chart" id="chart-lines"></div>
@@ -267,7 +267,7 @@ films.forEach((f,i)=>{
   f.nWeeks=Math.min(8,Math.floor((f.maxDay+1)/7));
   f.major=false;
 });
-films.slice().sort((a,b)=>a.open<b.open?1:a.open>b.open?-1:b.y-a.y).slice(0,10).forEach(f=>{f.major=true;});
+films.slice().sort((a,b)=>a.open<b.open?1:a.open>b.open?-1:b.y-a.y).slice(0,5).forEach(f=>{f.major=true;});
 const weekSum=(f,w)=>{let s=0;for(let i=7*w;i<7*w+7;i++){const r=f.map.get(i);if(r)s+=r[1];}return s;};
 const weekHol=(f,w)=>{for(let i=7*w;i<7*w+7;i++){if(HOL[iso(addDays(f.openD,i))])return true;}return false;};
 const drop=(f,w)=>weekSum(f,w)/weekSum(f,w-1)-1;
@@ -377,7 +377,9 @@ $('#mr-q').addEventListener('click',()=>{mRange='q';refreshMarket();});
 /* ---------- chart 2: aligned lines ---------- */
 const SLOTS=['--s1','--s2','--s3','--s4','--s5','--s6'];
 const top3=()=>films.slice().sort((a,b)=>b.y-a.y).slice(0,3).map(f=>f.short);
-const PRESETS={summer:['호프','스파이더맨','오디세이'],sep:['옵세션','인턴','타짜','암살자(들)','가능한 사랑','치이카와'],small:['명탐정 코난','오케이 마담2','경주기행','하츄핑']};
+const recent3=()=>{for(const w of [56,84,120,180]){const c=films.filter(f=>f.maxDay<=w);if(c.length>=3)return c.slice().sort((a,b)=>b.y-a.y).slice(0,3).map(f=>f.short);}
+  return films.slice().sort((a,b)=>a.open<b.open?1:a.open>b.open?-1:b.y-a.y).slice(0,3).map(f=>f.short);};
+const PRESETS={summer:['호프','스파이더맨','오디세이']};
 let mode='raw';let xcap=56;let sel=[];
 const freeSlot=()=>{for(let i=0;i<SLOTS.length;i++){if(!sel.some(s=>s.slot===i))return i;}return -1;};
 function setSel(names){sel=[];names.forEach(n=>{const f=byShort(n);if(f&&sel.length<6)sel.push({id:f.id,slot:sel.length});});}
@@ -453,7 +455,7 @@ function toggleFilm(id){const hint=$('#hint');const i=sel.findIndex(s=>s.id===id
   else{const sl=freeSlot();if(sl<0){hint.textContent='한 번에 6편까지 비교할 수 있습니다. 선택을 해제한 뒤 추가하세요.';return false;}sel.push({id,slot:sl});hint.textContent='';}
   refreshLines();return true;}
 $('#chipbox').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;toggleFilm(+b.dataset.id);});
-document.querySelectorAll('.pbtn').forEach(b=>b.addEventListener('click',()=>{setSel(b.dataset.p==='top3'?top3():PRESETS[b.dataset.p]);$('#hint').textContent='';refreshLines();}));
+document.querySelectorAll('.pbtn').forEach(b=>b.addEventListener('click',()=>{setSel(b.dataset.p==='top3'?top3():b.dataset.p==='recent'?recent3():PRESETS[b.dataset.p]);$('#hint').textContent='';refreshLines();}));
 $('#m-idx').addEventListener('click',()=>{mode='idx';refreshLines();});
 $('#m-raw').addEventListener('click',()=>{mode='raw';refreshLines();});
 $('#x-56').addEventListener('click',()=>{xcap=56;refreshLines();});
@@ -542,7 +544,7 @@ function renderWd(){
     '개봉 전 시사 관객은 누적에는 더하고, 일차별 비교 곡선은 개봉일(0일차)부터 그립니다.',
     '공휴일은 신정, 설 연휴(2/16~18), 삼일절과 대체공휴일(3/2), 노동절(5/1), 어린이날, 부처님오신날과 대체공휴일(5/25), 지방선거일(6/3), 현충일, 제헌절(7/17), 광복절과 대체공휴일(8/17), 추석 연휴(9/24~26), 개천절과 대체공휴일(10/5)입니다. 노동절과 제헌절은 올해부터 공휴일입니다. 5/4처럼 공휴일 사이에 낀 징검다리 날은 공휴일로 보지 않았습니다.',
     '문화가 있는 날(매월 마지막 수요일, 영화 관람료 할인)은 신작 개봉일과 겹치는 경우가 많아 할인 효과를 따로 떼어 볼 수 없습니다. 방학·성수기 같은 시즌 효과도 요일 지표에 섞여 있습니다.',
-    '빠른 선택의 관객수 TOP3는 1/1 이후 관객 기준이고, 드롭률 표 하단 중앙값은 올해 관객 상위 20편 기준입니다.',
+    '빠른 선택의 관객수 TOP3와 최근 흥행작은 1/1 이후 관객 기준입니다. 최근 흥행작은 최근 8주 안에 개봉한 영화 중 관객이 많은 3편으로, 날짜가 지나면 자동으로 바뀝니다. 드롭률 표 하단 중앙값은 올해 관객 상위 20편 기준입니다.',
     '요일 지표에는 공휴일이 없는 주만 썼습니다. 월~수와 목~일 평균은 각각 그 요일들의 하루 평균입니다.'
   ].map(t=>`<li>${t}</li>`).join('');
   $('#mtable').innerHTML='<thead><tr><th>날짜</th><th>요일</th><th>구분</th><th>관객수</th></tr></thead><tbody>'+mDay.slice().reverse().map(d=>`<tr><td>${d.k}</td><td style="text-align:left">${WD[d.dow]}</td><td style="text-align:left">${HOL[d.k]||(d.dow===0||d.dow===6?'주말':'평일')}</td><td>${d.v.toLocaleString('ko-KR')}</td></tr>`).join('')+'</tbody>';

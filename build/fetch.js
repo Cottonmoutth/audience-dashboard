@@ -40,7 +40,9 @@ function parseRows(html) {
     if (cells.length !== 12) continue;
     const title = cells[1].replace(/\s*(동일|New|신규|\d+\s*(상승|하락))$/, '').trim();
     const open = cells[2].trim();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(open)) continue;
+    // 개봉일이 비어 있거나 이상한 행도 버리지 않는다. 시장 전체 합계에는 들어가야 하고,
+    // 영화별 집계에서는 아래에서 걸러진다. 대신 머리글 행은 관객수 칸으로 가려낸다.
+    if (!title || !/^[\d,]+$/.test(cells[7].trim())) continue;
     const num = i => Number(String(cells[i]).replace(/[^0-9-]/g, '')) || 0;
     rows.push([title, open, num(7), num(10), num(11)]);
   }
@@ -122,6 +124,7 @@ async function collect(s, days, label) {
     }
   }
   const carry = Object.values(tally).filter(f =>
+    /^\d{4}-\d{2}-\d{2}$/.test(f.open) &&
     f.open < YEAR_START && f.open >= '2025-01-01' && f.t >= MIN_AUDIENCE);
   let Z = {};
   if (carry.length) {
@@ -153,7 +156,8 @@ async function collect(s, days, label) {
   const out = [];
   for (const k of Object.keys(films)) {
     const f = films[k];
-    if (f.y26 < MIN_AUDIENCE || f.open < '2025-01-01') continue;
+    if (f.y26 < MIN_AUDIENCE) continue;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(f.open) || f.open < '2025-01-01') continue;
     let pre = 0; const a = [];
     for (const [d, v] of Object.entries(f.rows)) {
       const i = (parse(d) - parse(f.open)) / 864e5;

@@ -25,7 +25,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" };
 const text = h => h
-  .replace(/<[^>]*>/g, ' ')
+  .replace(/<[^>]*>/g, '')
   .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (_, e) => ENT[e])
   .replace(/\s+/g, ' ')
   .trim();
@@ -36,9 +36,9 @@ function parseRows(html) {
   for (const tr of html.split(/<tr[\s>]/i).slice(1)) {
     const body = tr.split(/<\/tr>/i)[0];
     const cells = [];
-    for (const m of body.matchAll(/<t[dh][\s>]([\s\S]*?)<\/t[dh]>/gi)) cells.push(text(m[1]));
+    for (const m of body.matchAll(/<t([dh])(?:\s[^>]*)?>([\s\S]*?)<\/t\1>/gi)) cells.push(text(m[2]));
     if (cells.length !== 12) continue;
-    const title = cells[1].replace(/ (동일|New|신규|\d+상승|\d+하락)$/, '').trim();
+    const title = cells[1].replace(/\s*(동일|New|신규|\d+\s*(상승|하락))$/, '').trim();
     const open = cells[2].trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(open)) continue;
     const num = i => Number(String(cells[i]).replace(/[^0-9-]/g, '')) || 0;
@@ -172,11 +172,22 @@ async function collect(s, days, label) {
   if (out.length < 60) throw new Error(`영화 ${out.length}편 — 너무 적습니다`);
   if (!out.some(f => f.open < YEAR_START)) throw new Error('지난해 개봉작이 하나도 없습니다');
   if (mkt.some(v => v <= 0)) throw new Error('관객수가 0인 날이 있습니다');
+  const dirty = out.find(f => /[<>"]|class=/.test(f.n));
+  if (dirty) throw new Error(`영화 이름에 HTML이 섞였습니다 (${dirty.n.slice(0, 40)}) — 파서를 확인하세요`);
+  const ranky = out.find(f => / (동일|New|신규|\d+\s*(상승|하락))$/.test(f.n));
+  if (ranky) throw new Error(`영화 이름에 순위 변동이 붙었습니다 (${ranky.n.slice(0, 40)}) — 파서를 확인하세요`);
 
   const prevPath = path.join(ROOT, 'data.json');
   if (fs.existsSync(prevPath)) {
     const prev = JSON.parse(fs.readFileSync(prevPath, 'utf8'));
     if (mkt.length < prev.mkt.length) throw new Error(`날짜가 줄었습니다 (${prev.mkt.length} -> ${mkt.length})`);
+    // 지난 수집과 과거 날짜가 크게 달라지면 파싱이 잘못된 것이다 (마지막 3일은 보정될 수 있어 제외)
+    let drift = 0;
+    for (let i = 0; i < Math.min(prev.mkt.length, mkt.length) - 3; i++) {
+      if (prev.mkt[i] > 0 && Math.abs(mkt[i] - prev.mkt[i]) / prev.mkt[i] > 0.05) drift++;
+    }
+    if (drift > 3) throw new Error(`과거 ${drift}일의 값이 5% 넘게 달라졌습니다 — 수집이 잘못된 것 같습니다`);
+    if (out.length > prev.films.length + 15) throw new Error(`영화가 갑자기 ${prev.films.length} -> ${out.length}편으로 늘었습니다`);
   }
 
   fs.writeFileSync(prevPath, JSON.stringify({ films: out, mktStart: YEAR_START, mkt }));

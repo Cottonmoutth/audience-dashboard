@@ -2,7 +2,7 @@
 
 KOBIS 일별 박스오피스를 매일 받아, 한국 극장 관객의 움직임을 하나의 웹페이지로 보여 줍니다.
 
-**보기 → https://audience-dashboard-kappa.vercel.app/**
+**보기 → https://audience-pattern-dashboard.vercel.app/**
 
 ## 무엇을 보나
 

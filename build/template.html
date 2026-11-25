@@ -144,7 +144,9 @@ td.nm small{display:block;color:var(--muted);font-weight:400;font-size:11px;line
 .wkchips{display:flex;flex-wrap:wrap;gap:4px 12px;margin:6px 0 0;font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .notes{font-size:12.5px;color:var(--ink2)}
 .notes h2{font-size:15px}
-.notes ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.notes ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
+.notes b{color:var(--ink);font-weight:600}
+.notes li{max-width:78ch}
 details{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
 summary{cursor:pointer;font-size:13px;color:var(--ink2)}
 details .scroll{max-height:360px;overflow-y:auto;margin-top:8px}
@@ -238,7 +240,7 @@ details td:first-child,details th:first-child{position:static}
 
   <section class="panel" aria-labelledby="h-ins">
     <h2 id="h-ins">올해 진행상황과 이번 주 읽기</h2>
-    <p class="sub" style="max-width:none">윗줄 숫자는 데이터가 갱신될 때마다 자동으로 다시 계산됩니다. 아래 글은 매주 월요일에 새로 씁니다.</p>
+    <p class="sub" style="max-width:none">매주 월 갱신</p>
     <div class="kpis prog" id="prog"></div>
     <p class="lbl" style="margin:20px 0 2px">월별 관객수 (시장 전체) · 회색은 아직 진행 중인 달</p>
     <div class="chart" id="chart-mobars"></div>
@@ -329,11 +331,11 @@ const lastD=ymd(LAST);
   const wed722=byIso['2026-07-22'];
   const wb=(wed722.v/((byIso['2026-07-21'].v+byIso['2026-07-23'].v)/2));
   const fin=[
-    ['주말 쏠림은 안정적입니다',`연휴 없는 ${normalWeeks.length}주 모두 금~일이 그 주 관객의 ${Math.round(Math.min(...fsShare)*100)}~${Math.round(Math.max(...fsShare)*100)}%였습니다. 토요일은 주 평균의 <b>${wdIdx[5].toFixed(2)}배</b>, 일요일 ${wdIdx[6].toFixed(2)}배입니다. 주중에는 금요일(${wdIdx[4].toFixed(2)}배)부터 올라가기 시작합니다.`],
-    [`주말을 낀 4일은 월~수의 ${mean(blockRatio).toFixed(1)}배`,`목~일 4일의 하루 평균 관객은 월~수 3일의 평균 <b>${mean(blockRatio).toFixed(1)}배</b>(주마다 ${Math.min(...blockRatio).toFixed(1)}~${Math.max(...blockRatio).toFixed(1)}배)였습니다. 기간 합계를 비교할 때는 일수가 달라서 하루 평균으로 맞춰야 합니다.`],
-    [`휴일 하루는 평일의 약 ${(holAvg/wkdayAvg).toFixed(1)}배`,`공휴일 ${Object.keys(HOL).filter(k=>byIso[k]).length}일의 하루 평균이 ${fmtMan(Math.round(holAvg))}으로 평소 월~목(${fmtMan(Math.round(wkdayAvg))})의 <b>${(holAvg/wkdayAvg).toFixed(1)}배</b>였습니다. 연휴가 낀 주차는 드롭률이 왜곡됩니다.`],
-    ['2주차 드롭률은 영화마다 갈립니다',`호프 ${d('호프')}, 스파이더맨 ${d('스파이더맨')}로 같았고, 명탐정 코난 ${d('명탐정 코난')}, 오케이 마담2 ${d('오케이 마담2')}, 경주기행 ${d('경주기행')}은 더 가파르게 떨어졌습니다. 옵세션은 <b>${d('옵세션')}</b>로 오히려 늘었고 휴일이 없는 주라 입소문 효과로 읽힙니다.`],
-    ['수요일 효과는 신작이 만듭니다',`수요일 지수는 ${wdIdx[2].toFixed(2)}로 월~목 중 가장 높습니다. 국내 개봉이 수요일에 몰리고, 매월 마지막 수요일은 문화가 있는 날(관람료 할인)까지 겹치기 때문입니다. 주요 개봉작도 문화가 있는 날도 아니었던 7/22(수)는 앞뒤 날(화·목) 평균의 ${wb.toFixed(2)}배에 그쳤습니다.`]
+    ['주말 쏠림은 안정적입니다',`연휴가 없는 ${normalWeeks.length}주 모두 금~일 관객이 주간 전체의 ${Math.round(Math.min(...fsShare)*100)}~${Math.round(Math.max(...fsShare)*100)}%를 차지했습니다. 토요일 관객은 주 평균의 <b>${wdIdx[5].toFixed(2)}배</b>, 일요일은 ${wdIdx[6].toFixed(2)}배였습니다. 주중에는 금요일(${wdIdx[4].toFixed(2)}배)부터 관객이 늘어나기 시작합니다. 주말에 관객이 집중되는 흐름은 특정 시기에 국한되지 않고 연중 일관되게 나타났습니다.`],
+    [`주말을 낀 4일은 월~수의 ${mean(blockRatio).toFixed(1)}배`,`목~일 4일의 하루 평균 관객은 월~수 3일보다 <b>${mean(blockRatio).toFixed(1)}배</b> 많았습니다(주별 ${Math.min(...blockRatio).toFixed(1)}~${Math.max(...blockRatio).toFixed(1)}배). 주말이 포함된 기간에 관객이 집중되는 경향이 뚜렷합니다. 다만 기간별 관객 규모를 비교할 때는 집계 일수가 다른 만큼, 단순 합계보다 하루 평균을 기준으로 보는 것이 적절합니다.`],
+    [`공휴일 관객은 평일 평균의 ${(holAvg/wkdayAvg).toFixed(1)}배`,`공휴일 ${Object.keys(HOL).filter(k=>byIso[k]).length}일의 하루 평균 관객은 ${fmtMan(Math.round(holAvg))} 명으로, 평소 월~목 평균(${fmtMan(Math.round(wkdayAvg))} 명)의 <b>${(holAvg/wkdayAvg).toFixed(1)}배</b>였습니다. 공휴일 하루가 평일 여러 날에 맞먹는 관객을 끌어들이는 셈입니다. 따라서 연휴가 포함된 주차는 일반적인 주간 관객 흐름과 구분해 해석할 필요가 있습니다. 특히 이 시기에는 개봉 2주 차 드롭률도 연휴 효과의 영향을 받을 수 있습니다.`],
+    ['2주차 드롭률은 영화마다 갈립니다',`호프(${d('호프')})와 스파이더맨(${d('스파이더맨')})은 2주 차 관객이 비슷한 폭으로 줄었습니다. 반면 명탐정 코난(${d('명탐정 코난')}), 오케이 마담2(${d('오케이 마담2')}), 경주기행(${d('경주기행')})은 하락 폭이 더 컸습니다. 옵세션은 오히려 <b>${d('옵세션')}</b>로 관객이 늘었습니다. 휴일이 없는 주차에 나타난 상승이라는 점에서, 신작 효과보다는 입소문에 따른 관객 유입 가능성을 살펴볼 만합니다. 개봉 후 관객 유지력은 작품마다 상당한 차이를 보입니다.`],
+    ['수요일 관객은 신작 개봉과 할인 효과에 영향을 받습니다',`수요일 관객 지수는 ${wdIdx[2].toFixed(2)}로 월~목 중 가장 높았습니다. 국내 주요 신작의 개봉일이 수요일에 집중되는 데다, 매월 마지막 수요일에는 '문화가 있는 날'의 관람료 할인 효과도 더해지기 때문입니다. 반면 주요 개봉작도 문화가 있는 날도 아니었던 7월 22일(수)의 관객은 앞뒤 화·목요일 평균의 ${wb.toFixed(2)}배에 그쳤습니다. 수요일의 상대적인 강세가 요일 자체의 특성이라기보다 개봉 일정과 할인 정책의 영향을 크게 받는다는 점을 보여줍니다.`]
   ];
   $('#finds').innerHTML=fin.map(x=>`<div class="find"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join('');
 })();
@@ -558,13 +560,13 @@ function renderWd(){
 /* ---------- notes + data table ---------- */
 (function(){
   $('#notes').innerHTML=[
-    'KOBIS 일별 박스오피스(전일 집계)에서 1/1~'+md(lastD)+' 전체 순위를 읽었습니다. 일마감 후 보정으로 값이 바뀔 수 있습니다.',
-    '영화는 1/1 이후 관객이 10만 명 이상인 '+films.length+'편입니다. 지난해 개봉작 '+films.filter(f=>f.carry).length+'편은 개봉일(’25년)부터 데이터를 받아 올해 개봉작과 같은 방식으로 비교하며, 표와 순위의 관객 수는 1/1 이후만 셉니다(표기: 올해). 10만 명 미만 영화는 일차별 비교와 드롭률에서 빠지고, 시장 합계에는 순위에 오른 모든 영화가 들어갑니다.',
-    '개봉 전 시사 관객은 누적에는 더하고, 일차별 비교 곡선은 개봉일(0일차)부터 그립니다.',
-    '공휴일은 신정, 설 연휴(2/16~18), 삼일절과 대체공휴일(3/2), 노동절(5/1), 어린이날, 부처님오신날과 대체공휴일(5/25), 지방선거일(6/3), 현충일, 제헌절(7/17), 광복절과 대체공휴일(8/17), 추석 연휴(9/24~26), 개천절과 대체공휴일(10/5)입니다. 노동절과 제헌절은 올해부터 공휴일입니다. 5/4처럼 공휴일 사이에 낀 징검다리 날은 공휴일로 보지 않았습니다.',
-    '문화가 있는 날(매월 마지막 수요일, 영화 관람료 할인)은 신작 개봉일과 겹치는 경우가 많아 할인 효과를 따로 떼어 볼 수 없습니다. 방학·성수기 같은 시즌 효과도 요일 지표에 섞여 있습니다.',
-    '빠른 선택의 관객수 TOP3와 최근 흥행작은 1/1 이후 관객 기준입니다. 최근 흥행작은 최근 8주 안에 개봉한 영화 중 관객이 많은 3편으로, 날짜가 지나면 자동으로 바뀝니다. 드롭률 표 하단 중앙값은 올해 관객 상위 20편 기준입니다.',
-    '요일 지표에는 공휴일이 없는 주만 썼습니다. 월~수와 목~일 평균은 각각 그 요일들의 하루 평균입니다.'
+    '<b>데이터 출처</b> — KOBIS 일별 박스오피스(전일 집계), 1/1~'+md(lastD)+' 기준. 일마감 후 보정에 따라 수치가 달라질 수 있습니다.',
+    '<b>분석 대상</b> — 올해 관객 10만 명 이상인 영화 '+films.length+'편. 지난해 개봉작 '+films.filter(f=>f.carry).length+'편은 개봉일부터 데이터를 포함하되, 관객 수는 1/1 이후만 집계했습니다. 10만 명 미만 영화는 일차별 비교와 드롭률에서 제외하고, 시장 합계에는 포함했습니다.',
+    '<b>관객 집계</b> — 개봉 전 시사 관객은 누적 관객에 포함하고, 일차별 비교는 개봉일(0일차)부터 시작합니다.',
+    '<b>공휴일 기준</b> — 신정, 설·추석 연휴, 법정 공휴일 및 대체공휴일, 지방선거일을 포함했습니다. 올해부터 공휴일로 지정된 노동절(5/1)과 제헌절(7/17)도 포함했으며, 징검다리 휴일은 제외했습니다.',
+    '<b>요일 지표</b> — 공휴일이 없는 주만 분석했습니다. 월~수와 목~일은 각각 해당 요일의 하루 평균 관객을 기준으로 비교했습니다.',
+    '<b>분석 한계</b> — 문화가 있는 날은 신작 개봉과 겹치는 경우가 많아 할인 효과를 분리하기 어렵습니다. 방학·성수기 등 계절적 요인도 요일 지표에 반영됩니다.',
+    '<b>기타 기준</b> — 관객 TOP3와 최근 흥행작은 1/1 이후 관객 기준입니다. 최근 흥행작은 최근 8주 내 개봉작 중 관객 상위 3편이며, 드롭률 표의 중앙값은 올해 관객 상위 20편 기준입니다.'
   ].map(t=>`<li>${t}</li>`).join('');
   $('#mtable').innerHTML='<thead><tr><th>날짜</th><th>요일</th><th>구분</th><th>관객수</th></tr></thead><tbody>'+mDay.slice().reverse().map(d=>`<tr><td>${d.k}</td><td style="text-align:left">${WD[d.dow]}</td><td style="text-align:left">${HOL[d.k]||(d.dow===0||d.dow===6?'주말':'평일')}</td><td>${d.v.toLocaleString('ko-KR')}</td></tr>`).join('')+'</tbody>';
 })();

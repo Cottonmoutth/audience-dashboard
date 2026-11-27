@@ -149,6 +149,15 @@ td.nm small{display:block;color:var(--muted);font-weight:400;font-size:11px;line
 .notes b{color:var(--ink);font-weight:600}
 
 details{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
+#findbox{margin:0;border:0;padding:0}
+#findbox > summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;margin:0 0 12px}
+#findbox > summary::-webkit-details-marker{display:none}
+#findbox > summary h2{margin:0}
+#findbox > summary:hover h2{color:var(--ink2)}
+.chev{width:7px;height:7px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(-45deg);transition:transform .15s ease;flex:none;position:relative;top:-1px}
+#findbox[open] > summary .chev{transform:rotate(45deg);top:-3px}
+#findbox:not([open]) > .finds{display:none}
+#findbox:not([open]) > summary{margin-bottom:0}
 summary{cursor:pointer;font-size:13px;color:var(--ink2)}
 details .scroll{max-height:360px;overflow-y:auto;margin-top:8px}
 details th{position:sticky;top:0;background:var(--surface)}
@@ -177,8 +186,10 @@ details td:first-child,details th:first-child{position:static}
   <div class="kpis" id="kpis"></div>
 
   <section aria-labelledby="h-find">
-    <h2 id="h-find" style="margin-bottom:12px">핵심 발견</h2>
-    <div class="finds" id="finds"></div>
+    <details id="findbox" open>
+      <summary><h2 id="h-find">핵심 발견</h2><span class="chev" aria-hidden="true"></span></summary>
+      <div class="finds" id="finds"></div>
+    </details>
   </section>
 
   <section class="panel" aria-labelledby="h-mkt">
@@ -320,7 +331,7 @@ const lastD=ymd(LAST);
 /* ---------- header + KPI + findings ---------- */
 (function(){
   $('#eyebrow').textContent='KOBIS 일별 박스오피스 · 2026.01.01 – '+(lastD.getUTCMonth()+1)+'.'+lastD.getUTCDate();
-  $('#lede').textContent='개봉 이후 일별 관객수로 요일 리듬, 개봉 주차별 드롭률, 연휴 효과를 비교합니다. 1/1 이후 관객 데이터가 있고 그 기간 관객이 10만 명 이상인 영화 '+films.length+'편(지난해 개봉작 '+films.filter(f=>f.carry).length+'편 포함)과 시장 전체 합계를 다룹니다.';
+  $('#lede').textContent='개봉 이후 일별 관객 데이터를 바탕으로 요일별 관객 흐름과 개봉 주차별 드롭률, 연휴 효과를 분석합니다. 분석 대상은 1월 1일 이후 관객이 10만 명 이상인 영화 '+films.length+'편(지난해 개봉작 '+films.filter(f=>f.carry).length+'편 포함)이며, 시장 전체 관객 추이도 함께 살펴봅니다.';
   const k=[
     [mDay.length+'일 총 관객수',(mTotal/10000).toLocaleString('ko-KR',{maximumFractionDigits:0})+'만','1/1~'+md(lastD)+', 전체 순위 합계'],
     ['금~일 비중',Math.round(mean(fsShare)*100)+'%','연휴 없는 '+normalWeeks.length+'주 평균 ('+Math.round(Math.min(...fsShare)*100)+'~'+Math.round(Math.max(...fsShare)*100)+'%)'],
